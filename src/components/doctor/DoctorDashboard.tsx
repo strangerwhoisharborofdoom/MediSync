@@ -79,6 +79,13 @@ export const DoctorDashboard: React.FC = () => {
 
   const activePatient = cohortPatients.find((p: PatientInfo) => p.id === selectedPatientId) || patient;
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t.goodMorning;
+    if (hour < 17) return t.goodAfternoon;
+    return t.goodEvening;
+  };
+
   const handleGenerateSummary = () => {
     setIsGeneratingAi(true);
     setTimeout(() => {
@@ -122,20 +129,20 @@ export const DoctorDashboard: React.FC = () => {
             <span className="text-xs text-slate-400">Cardiology Clinic</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-display tracking-tight text-white">
-            {t.clinicalOverview}
+            {getGreeting()}, Dr. Rao
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
             Cohort Risk Stratification • Tele-Adherence Monitoring & e-Prescriptions
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             id="doctor-new-prescription-button"
             onClick={() => setIsRxModalOpen(true)}
-            className="px-5 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2 active:scale-95 transition-all"
+            className="px-4 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2 active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             <span>{t.newPrescription}</span>
           </button>
         </div>

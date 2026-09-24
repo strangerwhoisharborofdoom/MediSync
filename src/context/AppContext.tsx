@@ -16,6 +16,7 @@ import {
   ChatMessage,
   NotificationItem,
   OrderStatus,
+  PharmacyAlert,
 } from '../types';
 import { translations, Translations } from '../i18n/translations';
 
@@ -50,6 +51,7 @@ interface AppContextType {
   prescriptions: Prescription[];
   vitals: VitalRecord[];
   alerts: CareAlert[];
+  pharmacyAlerts: PharmacyAlert[];
   inventory: InventoryItem[];
   appointments: Appointment[];
   messages: ChatMessage[];
@@ -81,6 +83,8 @@ interface AppContextType {
   markAllNotificationsAsRead: () => void;
   clearAllNotifications: () => void;
   deleteNotification: (id: string) => void;
+  markPharmacyAlertRead: (id: string) => void;
+  deletePharmacyAlert: (id: string) => void;
   addNotification: (
     roleOrItem:
       | Role
@@ -261,9 +265,9 @@ const INITIAL_MEDICATIONS: Medication[] = [
     frequency: 'Once daily',
     timing: 'Morning (8:00 AM)',
     foodInstruction: 'Can be taken with or without food',
-    remainingDays: 7,
+    remainingDays: 3,
     totalDays: 30,
-    pillsRemaining: 7,
+    pillsRemaining: 3,
     pillsTotal: 30,
     pillDetails: {
       shape: 'Round',
@@ -282,6 +286,33 @@ const INITIAL_MEDICATIONS: Medication[] = [
   },
   {
     id: 'med-2',
+    name: 'Paracetamol 500mg',
+    genericName: 'Acetaminophen / Paracetamol',
+    dosage: '500 mg',
+    frequency: 'Twice daily',
+    timing: 'After lunch (1:00 PM) & Evening (7:00 PM)',
+    foodInstruction: 'Take with or after food with water',
+    remainingDays: 4,
+    totalDays: 30,
+    pillsRemaining: 6,
+    pillsTotal: 30,
+    pillDetails: {
+      shape: 'Caplet',
+      color: 'White',
+      imprint: 'PARA 500',
+      size: '12 mm',
+      description: 'White oblong caplet debossed with PARA 500',
+    },
+    warnings: [
+      'Do not exceed maximum daily dosage of 4000 mg across all products.',
+      'Avoid concurrent consumption with other acetaminophen-containing medications.',
+    ],
+    refillStatus: 'refill_recommended',
+    prescribedBy: 'Dr. Maya Rao, MD',
+    startDate: '2026-08-20',
+  },
+  {
+    id: 'med-3',
     name: 'Metformin',
     genericName: 'Metformin Hydrochloride',
     dosage: '500 mg',
@@ -308,7 +339,7 @@ const INITIAL_MEDICATIONS: Medication[] = [
     startDate: '2026-07-10',
   },
   {
-    id: 'med-3',
+    id: 'med-4',
     name: 'Atorvastatin',
     genericName: 'Atorvastatin Calcium',
     dosage: '20 mg',
@@ -334,6 +365,33 @@ const INITIAL_MEDICATIONS: Medication[] = [
     prescribedBy: 'Dr. Maya Rao, MD',
     startDate: '2026-08-01',
   },
+  {
+    id: 'med-5',
+    name: 'Lisinopril 10mg',
+    genericName: 'Lisinopril Dihydrate',
+    dosage: '10 mg',
+    frequency: 'Once daily',
+    timing: 'Morning (09:00 AM)',
+    foodInstruction: 'Take once daily in the morning with water',
+    remainingDays: 25,
+    totalDays: 30,
+    pillsRemaining: 25,
+    pillsTotal: 30,
+    pillDetails: {
+      shape: 'Round',
+      color: 'Yellow',
+      imprint: 'LIS 10',
+      size: '7 mm',
+      description: 'Round yellow tablet debossed with LIS 10',
+    },
+    warnings: [
+      'Avoid potassium supplements unless advised by physician.',
+      'Inform doctor if dry persistent cough develops.',
+    ],
+    refillStatus: 'healthy',
+    prescribedBy: 'Dr. Maya Rao, MD',
+    startDate: '2026-08-05',
+  },
 ];
 
 const INITIAL_SCHEDULE: DoseSchedule[] = [
@@ -350,16 +408,26 @@ const INITIAL_SCHEDULE: DoseSchedule[] = [
   {
     id: 'dose-2',
     medicationId: 'med-2',
-    medicationName: 'Metformin',
+    medicationName: 'Paracetamol 500mg',
     dosage: '500 mg',
     scheduledTime: '01:00 PM',
     status: 'upcoming',
-    foodRule: 'with_food',
-    notes: 'Blood glucose management. Take with lunch.',
+    foodRule: 'after_food',
+    notes: 'Mild joint discomfort management. Take after meal.',
   },
   {
     id: 'dose-3',
     medicationId: 'med-3',
+    medicationName: 'Metformin',
+    dosage: '500 mg',
+    scheduledTime: '01:30 PM',
+    status: 'upcoming',
+    foodRule: 'with_food',
+    notes: 'Glycemic control. Take with lunch.',
+  },
+  {
+    id: 'dose-4',
+    medicationId: 'med-4',
     medicationName: 'Atorvastatin',
     dosage: '20 mg',
     scheduledTime: '08:00 PM',
@@ -369,34 +437,7 @@ const INITIAL_SCHEDULE: DoseSchedule[] = [
   },
 ];
 
-const INITIAL_ORDERS: RefillOrder[] = [
-  {
-    id: 'ord-8812',
-    patientId: 'p-20481',
-    patientName: 'Eleanor Vance',
-    medicationId: 'med-1',
-    medicationName: 'Amlodipine',
-    dosage: '5 mg (30-day supply / 30 tablets)',
-    quantity: 30,
-    requestedAt: 'Today at 09:15 AM',
-    priority: 'routine',
-    status: 'preparing',
-    deliveryMethod: 'home_delivery',
-    deliveryAddress: '742 Evergreen Terrace, Apt 3B',
-    pharmacyId: 'ph-77192',
-    pharmacyName: 'MediCare Central Community Pharmacy',
-    history: [
-      { status: 'pending_preparation', timestamp: '09:15 AM', note: 'Order submitted by Eleanor Vance via Smart Refill' },
-      { status: 'preparing', timestamp: '09:30 AM', note: 'Pharmacist Marcus Chen verified active prescription and commenced batch counting' },
-    ],
-    trackingCoordinates: {
-      lat: 37.7765,
-      lng: -122.4172,
-      etaMinutes: 24,
-      currentLocationName: 'En route via Market St & 8th St',
-    },
-  },
-];
+const INITIAL_ORDERS: RefillOrder[] = [];
 
 const INITIAL_PRESCRIPTIONS: Prescription[] = [
   {
@@ -462,6 +503,48 @@ const INITIAL_PRESCRIPTIONS: Prescription[] = [
     pharmacyStatus: 'approved',
     ocrConfidence: 98,
   },
+  {
+    id: 'rx-9024',
+    patientId: 'p-20481',
+    patientName: 'Eleanor Vance',
+    doctorId: 'd-48201',
+    doctorName: 'Dr. Maya Rao, MD',
+    doctorLicense: 'MED-LIC-89410',
+    medicationName: 'Paracetamol',
+    dosage: '500 mg',
+    frequency: 'Twice daily as needed',
+    timing: 'After lunch & evening',
+    durationDays: 30,
+    instructions: 'Take 1 tablet twice daily after meals for joint comfort. Do not exceed 4000mg/day.',
+    foodInstruction: 'Take after meals with water.',
+    refillsAllowed: 3,
+    refillsRemaining: 2,
+    issuedDate: '2026-08-20',
+    status: 'active',
+    pharmacyStatus: 'approved',
+    ocrConfidence: 97,
+  },
+  {
+    id: 'rx-9025',
+    patientId: 'p-20481',
+    patientName: 'Eleanor Vance',
+    doctorId: 'd-48201',
+    doctorName: 'Dr. Maya Rao, MD',
+    doctorLicense: 'MED-LIC-89410',
+    medicationName: 'Lisinopril',
+    dosage: '10 mg',
+    frequency: 'Once daily',
+    timing: 'Morning',
+    durationDays: 30,
+    instructions: 'Take 1 tablet every morning with water for cardiovascular support.',
+    foodInstruction: 'With water.',
+    refillsAllowed: 4,
+    refillsRemaining: 4,
+    issuedDate: '2026-08-05',
+    status: 'active',
+    pharmacyStatus: 'approved',
+    ocrConfidence: 99,
+  },
 ];
 
 const INITIAL_VITALS: VitalRecord[] = [
@@ -479,8 +562,8 @@ const INITIAL_ALERTS: CareAlert[] = [
     patientName: 'Eleanor Vance',
     type: 'refill_needed',
     severity: 'medium',
-    title: 'Amlodipine Supply Low (7 Days Remaining)',
-    message: 'Amlodipine 5mg has reached the 7-day threshold. Automatic refill has been suggested to maintain therapy continuity.',
+    title: 'Amlodipine Supply Low (3 Days Remaining)',
+    message: 'Amlodipine 5mg has reached the 3-day threshold. Automatic refill has been suggested to maintain therapy continuity.',
     timestamp: 'Today at 08:30 AM',
     read: false,
     acknowledged: false,
@@ -500,12 +583,117 @@ const INITIAL_ALERTS: CareAlert[] = [
   },
 ];
 
+const INITIAL_PHARMACY_ALERTS: PharmacyAlert[] = [
+  // STOCK REFILL ALERTS
+  {
+    id: 'palert-stock-1',
+    type: 'STOCK',
+    title: 'Paracetamol stock is running low.',
+    message: 'Paracetamol 500mg stock is running low (45 bottles left, 4.5 days reserve remaining). Automated replenishment recommended.',
+    priority: 'high',
+    timestamp: 'Today at 08:15 AM',
+    read: false,
+    relatedMedicineId: 'inv-2',
+  },
+  {
+    id: 'palert-stock-2',
+    type: 'STOCK',
+    title: 'Amoxicillin has reached minimum stock level.',
+    message: 'Amoxicillin 500mg has reached critical threshold (2.2 days supply remaining). Safety stock replenishment needed.',
+    priority: 'critical',
+    timestamp: 'Today at 07:30 AM',
+    read: false,
+    relatedMedicineId: 'inv-6',
+  },
+  {
+    id: 'palert-stock-3',
+    type: 'STOCK',
+    title: '12 medicines require inventory replenishment.',
+    message: 'Weekly inventory assessment shows 12 wholesale stock items require replenishment.',
+    priority: 'medium',
+    timestamp: 'Yesterday at 05:00 PM',
+    read: false,
+  },
+  // ORDER ALERTS
+  {
+    id: 'palert-order-1',
+    type: 'ORDER',
+    title: 'New medicine order received.',
+    message: 'Order #MS1024 is awaiting processing for Eleanor Vance (Amlodipine 5mg).',
+    priority: 'high',
+    timestamp: 'Today at 09:15 AM',
+    read: false,
+    relatedOrderId: 'ord-8812',
+  },
+  {
+    id: 'palert-order-2',
+    type: 'ORDER',
+    title: 'Order #MS1024 is awaiting processing.',
+    message: 'Prescription verification complete. Order #MS1024 queued for pharmacist batch dispensing.',
+    priority: 'high',
+    timestamp: 'Today at 09:18 AM',
+    read: false,
+    relatedOrderId: 'ord-8812',
+  },
+  {
+    id: 'palert-order-3',
+    type: 'ORDER',
+    title: 'Order #MS1025 has been successfully dispatched.',
+    message: 'Order #MS1025 for Metformin 500mg has been dispatched via MediSync Express Courier.',
+    priority: 'low',
+    timestamp: 'Today at 08:45 AM',
+    read: true,
+  },
+  // PRESCRIPTION ALERTS
+  {
+    id: 'palert-rx-1',
+    type: 'PRESCRIPTION',
+    title: 'New prescription received for verification.',
+    message: 'New prescription #rx-9021 for Amlodipine Besylate received from Dr. Maya Rao, MD.',
+    priority: 'high',
+    timestamp: 'Today at 08:30 AM',
+    read: false,
+    relatedPrescriptionId: 'rx-9021',
+  },
+  {
+    id: 'palert-rx-2',
+    type: 'PRESCRIPTION',
+    title: 'Prescription requires pharmacist review.',
+    message: 'Prescription #rx-9024 for Paracetamol 500mg requires pharmacist review & approval.',
+    priority: 'medium',
+    timestamp: 'Today at 08:00 AM',
+    read: false,
+    relatedPrescriptionId: 'rx-9024',
+  },
+  {
+    id: 'palert-rx-3',
+    type: 'PRESCRIPTION',
+    title: 'Prescription verification completed.',
+    message: 'Prescription verification completed for #rx-9022 (Metformin HCl 500mg).',
+    priority: 'low',
+    timestamp: 'Yesterday at 04:30 PM',
+    read: true,
+    relatedPrescriptionId: 'rx-9022',
+  },
+  {
+    id: 'palert-rx-4',
+    type: 'PRESCRIPTION',
+    title: 'Prescription has expired.',
+    message: 'Prescription #rx-8710 for Ciprofloxacin 250mg has reached expiration date.',
+    priority: 'medium',
+    timestamp: 'Yesterday at 02:00 PM',
+    read: true,
+  },
+];
+
 const INITIAL_INVENTORY: InventoryItem[] = [
   { id: 'inv-1', medicationName: 'Amlodipine', dosage: '5 mg', currentStock: 140, dailyDemand: 18, daysRemaining: 7.7, expiryDate: '2027-11-30', status: 'healthy', unit: 'bottles (30s)' },
-  { id: 'inv-2', medicationName: 'Metformin', dosage: '500 mg', currentStock: 450, dailyDemand: 35, daysRemaining: 12.8, expiryDate: '2028-04-15', status: 'healthy', unit: 'bottles (60s)' },
-  { id: 'inv-3', medicationName: 'Atorvastatin', dosage: '20 mg', currentStock: 90, dailyDemand: 25, daysRemaining: 3.6, expiryDate: '2027-09-20', status: 'low_stock', unit: 'bottles (30s)' },
-  { id: 'inv-4', medicationName: 'Amoxicillin', dosage: '500 mg', currentStock: 45, dailyDemand: 20, daysRemaining: 2.2, expiryDate: '2027-03-10', status: 'critical', unit: 'bottles (20s)' },
-  { id: 'inv-5', medicationName: 'Lisinopril', dosage: '10 mg', currentStock: 310, dailyDemand: 15, daysRemaining: 20.6, expiryDate: '2028-01-20', status: 'healthy', unit: 'bottles (30s)' },
+  { id: 'inv-2', medicationName: 'Paracetamol 500mg', dosage: '500 mg', currentStock: 45, dailyDemand: 10, daysRemaining: 4.5, expiryDate: '2028-06-30', status: 'low_stock', unit: 'bottles (100s)' },
+  { id: 'inv-3', medicationName: 'Paracetamol Syrup', dosage: '120 mg / 5 mL', currentStock: 12, dailyDemand: 3, daysRemaining: 4.0, expiryDate: '2027-12-15', status: 'low_stock', unit: 'bottles (100mL)' },
+  { id: 'inv-4', medicationName: 'Metformin', dosage: '500 mg', currentStock: 450, dailyDemand: 35, daysRemaining: 12.8, expiryDate: '2028-04-15', status: 'healthy', unit: 'bottles (60s)' },
+  { id: 'inv-5', medicationName: 'Atorvastatin', dosage: '20 mg', currentStock: 90, dailyDemand: 25, daysRemaining: 3.6, expiryDate: '2027-09-20', status: 'low_stock', unit: 'bottles (30s)' },
+  { id: 'inv-6', medicationName: 'Amoxicillin', dosage: '500 mg', currentStock: 45, dailyDemand: 20, daysRemaining: 2.2, expiryDate: '2027-03-10', status: 'critical', unit: 'bottles (20s)' },
+  { id: 'inv-7', medicationName: 'Lisinopril', dosage: '10 mg', currentStock: 310, dailyDemand: 15, daysRemaining: 20.6, expiryDate: '2028-01-20', status: 'healthy', unit: 'bottles (30s)' },
 ];
 
 const INITIAL_APPOINTMENTS: Appointment[] = [
@@ -730,7 +918,7 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'medisync_state_v1';
+const STORAGE_KEY = 'medisync_state_v3';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Load saved state or default
@@ -762,6 +950,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [prescriptions, setPrescriptions] = useState<Prescription[]>(savedState?.prescriptions || INITIAL_PRESCRIPTIONS);
   const [vitals, setVitals] = useState<VitalRecord[]>(savedState?.vitals || INITIAL_VITALS);
   const [alerts, setAlerts] = useState<CareAlert[]>(savedState?.alerts || INITIAL_ALERTS);
+  const [pharmacyAlerts, setPharmacyAlerts] = useState<PharmacyAlert[]>(savedState?.pharmacyAlerts || INITIAL_PHARMACY_ALERTS);
   const [inventory, setInventory] = useState<InventoryItem[]>(savedState?.inventory || INITIAL_INVENTORY);
   const [appointments, setAppointments] = useState<Appointment[]>(savedState?.appointments || INITIAL_APPOINTMENTS);
   const [messages, setMessages] = useState<ChatMessage[]>(savedState?.messages || INITIAL_MESSAGES);
@@ -794,6 +983,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         prescriptions,
         vitals,
         alerts,
+        pharmacyAlerts,
         inventory,
         appointments,
         messages,
@@ -819,6 +1009,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     prescriptions,
     vitals,
     alerts,
+    pharmacyAlerts,
     inventory,
     appointments,
     messages,
@@ -1115,6 +1306,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     deliveryMethod: 'pickup' | 'home_delivery' = 'home_delivery'
   ) => {
     const med = medications.find((m) => m.id === medicationId) || medications[0];
+
+    // Prevent duplicate refill orders if already pending
+    if (med.refillStatus === 'pending') {
+      addToast(`A refill order for ${med.name} is already currently pending with the pharmacy.`, 'warning');
+      return;
+    }
+
     const orderId = `ord-${Math.floor(1000 + Math.random() * 9000)}`;
     const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 
@@ -1150,12 +1348,42 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     setRefillOrders((prev) => [newOrder, ...prev]);
 
-    // Update med refillStatus
+    // Update med refillStatus immediately to pending
     setMedications((prev) =>
       prev.map((m) => (m.id === med.id ? { ...m, refillStatus: 'pending' } : m))
     );
 
-    // Instant notification for Pharmacy
+    // Also decrement prescription refill authorization
+    setPrescriptions((prev) =>
+      prev.map((rx) => {
+        if (
+          rx.medicationName.toLowerCase().includes(med.name.toLowerCase()) ||
+          med.name.toLowerCase().includes(rx.medicationName.toLowerCase())
+        ) {
+          return {
+            ...rx,
+            refillsRemaining: Math.max(0, rx.refillsRemaining - 1),
+          };
+        }
+        return rx;
+      })
+    );
+
+    // Emit dedicated Pharmacy Alert
+    const newPharmacyAlert: PharmacyAlert = {
+      id: `palert-order-${Date.now()}`,
+      type: 'ORDER',
+      title: 'New medicine order received.',
+      message: `Order #${orderId} is awaiting processing for Eleanor Vance (${med.name} ${med.dosage}).`,
+      priority: priority === 'urgent' ? 'critical' : 'high',
+      timestamp: `Today at ${nowTime}`,
+      read: false,
+      relatedOrderId: orderId,
+      relatedMedicineId: med.id,
+    };
+    setPharmacyAlerts((prev) => [newPharmacyAlert, ...prev]);
+
+    // Instant notification for Pharmacy & Patient
     addNotification(
       'pharmacy',
       `New Refill Request: #${orderId}`,
@@ -1548,41 +1776,76 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addToast('🚨 EMERGENCY SOS DISPATCH SIMULATED. Responders & Caregiver alerted!', 'error');
   };
 
-  // AI PROGRESS SUMMARY GENERATOR
+  // AI PATIENT HEALTH DATA SUMMARY GENERATOR (Patient-specific, strictly grounded, zero fabrication)
   const generateAiSummary = (patientId: string = 'p-20481') => {
     const p = patientId === 'p-20481' ? patient : otherPatients.find((x) => x.id === patientId) || patient;
-    const summary = `### MediSync Clinical AI Progress Summary (Demo Model)
-**Patient:** ${p.name} (Age: ${p.age} | ${p.medicalId})
-**Generated at:** ${new Date().toLocaleString()}
 
-#### 1. Medication Adherence & Routine
-- **30-Day Adherence:** ${p.adherenceRate}% (${p.streakDays}-day consecutive streak).
-- **Recent Administration:** Today's morning dose of Amlodipine 5mg logged on schedule. Metformin 500mg and Atorvastatin 20mg queued in adaptive care plan.
-- **Risk Assessment:** Readmission risk calculated at ${p.readmissionRiskPercent}% (${p.riskLevel} Tier).
+    if (medications.length === 0 && todaySchedule.length === 0 && appointments.length === 0) {
+      const emptyMsg = t.insufficientDataSummary || "There isn't enough patient data available to generate a detailed health summary.";
+      setLatestAiSummary(emptyMsg);
+      return emptyMsg;
+    }
 
-#### 2. Biometric Stability & Vitals
-- **Blood Pressure Trends:** Mean arterial pressure stabilized at 126/80 mmHg over the last 5 logs.
-- **Resting Heart Rate:** Steady at 71–74 BPM with sinus rhythm stability.
-- **Reported Mood/Wellbeing:** Patient logged 'Good' with zero adverse dizziness or gastrointestinal episodes.
+    const medCount = medications.length;
+    const dueTodayDoses = todaySchedule.filter((d) => d.status === 'due');
+    const takenTodayDoses = todaySchedule.filter((d) => d.status === 'taken');
+    const lowSupplyMeds = medications.filter((m) => m.remainingDays <= 7 && m.refillStatus !== 'pending');
+    const pendingRefillOrders = refillOrders.filter((o) => o.status !== 'delivered');
+    const nextAppointment = appointments.find((a) => a.status === 'upcoming');
+    const latestVital = vitals.length > 0 ? vitals[vitals.length - 1] : null;
 
-#### 3. Refill & Supply Continuity
-- **Amlodipine 5mg:** 7-day reserve threshold triggered Smart Refill #ord-8812; pharmacy status currently PREPARING. Zero therapy gap projected.
+    const medListStr = medications.map((m) => `${m.name} (${m.dosage}, ${m.frequency})`).join(', ');
 
-*Note: Demo AI summary synthesized for clinical decision support. Not a standalone diagnostic substitute.*`;
+    let summaryText = `You currently have ${medCount} active medication${medCount !== 1 ? 's' : ''}: ${medListStr}.\n\n`;
 
-    setLatestAiSummary(summary);
+    if (todaySchedule.length > 0) {
+      summaryText += `• Today's Schedule: ${dueTodayDoses.length} dose${dueTodayDoses.length !== 1 ? 's' : ''} currently due today (${dueTodayDoses.map((d) => `${d.medicationName} at ${d.scheduledTime}`).join(', ') || 'None'}), with ${takenTodayDoses.length} dose${takenTodayDoses.length !== 1 ? 's' : ''} already taken.\n`;
+    }
+
+    if (lowSupplyMeds.length > 0) {
+      summaryText += `• Refill & Inventory Requirements: ${lowSupplyMeds.length} medication${lowSupplyMeds.length !== 1 ? 's are' : ' is'} running low and require refill (${lowSupplyMeds.map((m) => `${m.name} has ${m.remainingDays} days / ${m.pillsRemaining} pills remaining`).join(', ')}).\n`;
+    } else {
+      summaryText += `• Refill & Inventory Requirements: All medication supplies are currently sufficient with no pending low-stock warnings.\n`;
+    }
+
+    if (pendingRefillOrders.length > 0) {
+      summaryText += `• Active Refill Orders: ${pendingRefillOrders.length} order in fulfillment pipeline (${pendingRefillOrders.map((o) => `Order #${o.id} for ${o.medicationName} - Status: ${o.status.replace(/_/g, ' ').toUpperCase()}`).join(', ')}).\n`;
+    }
+
+    summaryText += `• Medication Adherence: Recent compliance is ${p.adherenceRate}%, with an active streak of ${p.streakDays} consecutive day${p.streakDays !== 1 ? 's' : ''}.\n`;
+
+    if (nextAppointment) {
+      summaryText += `• Next Doctor Appointment: Scheduled with ${nextAppointment.doctorName} (${nextAppointment.department}) on ${nextAppointment.dateTime} at ${nextAppointment.location}.\n`;
+    }
+
+    if (latestVital) {
+      summaryText += `• Recent Health Records: Arterial blood pressure logged at ${latestVital.systolicBP}/${latestVital.diastolicBP} mmHg with heart rate of ${latestVital.heartRate} BPM (Vitals recorded: ${latestVital.timestamp}).\n`;
+    }
+
+    summaryText += `\n[Informational Notice: This is an AI-generated informational health summary synthesized exclusively from your verified MediSync patient records. It does not constitute a medical diagnosis, clinical prognosis, or doctor prescription.]`;
+
+    setLatestAiSummary(summaryText);
 
     addAuditLog(
-      'Dr. Maya Rao, MD',
-      'doctor',
-      `Generated AI Progress Summary for ${p.name}`,
+      currentUser.name,
+      activeRole,
+      `Generated AI Healthcare Summary for ${p.name}`,
       'prescription',
       p.id,
-      'NLP synthesis of adherence records, biometric streams, and pharmacy refills.'
+      'Automated patient data synthesis of current medications, adherence, refill status, and vitals.'
     );
 
-    addToast('⚡ AI Progress Summary synthesized successfully!', 'success');
-    return summary;
+    addToast(`AI Health Summary synthesized for ${p.name}`, 'success');
+    return summaryText;
+  };
+
+  const markPharmacyAlertRead = (id: string) => {
+    setPharmacyAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, read: true } : a)));
+  };
+
+  const deletePharmacyAlert = (id: string) => {
+    setPharmacyAlerts((prev) => prev.filter((a) => a.id !== id));
+    addToast('Pharmacy alert dismissed', 'info');
   };
 
   const markNotificationRead = (id: string) => {
@@ -1697,6 +1960,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     prescriptions,
     vitals,
     alerts,
+    pharmacyAlerts,
     inventory,
     appointments,
     messages,
@@ -1723,6 +1987,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     markAllNotificationsAsRead,
     clearAllNotifications,
     deleteNotification,
+    markPharmacyAlertRead,
+    deletePharmacyAlert,
     addNotification,
     acknowledgeAlert,
     addToast,

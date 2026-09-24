@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { tSafe } from '../../i18n/translations';
 import {
   Truck,
   PackageCheck,
@@ -12,10 +13,11 @@ import {
   AlertCircle,
   Plus,
   MapPin,
+  X,
 } from 'lucide-react';
 
 export const RefillsView: React.FC = () => {
-  const { refillOrders, medications, createRefillOrder, patient, addToast } = useApp();
+  const { refillOrders, medications, createRefillOrder, patient, addToast, t } = useApp();
   const [selectedMedId, setSelectedMedId] = useState(medications[0]?.id || '');
   const [isOrdering, setIsOrdering] = useState(false);
 
@@ -30,9 +32,11 @@ export const RefillsView: React.FC = () => {
     switch (status) {
       case 'requested':
       case 'pending':
+      case 'pending_preparation':
         return 1;
       case 'approved':
       case 'processing':
+      case 'preparing':
         return 2;
       case 'filled':
       case 'ready':
@@ -62,7 +66,7 @@ export const RefillsView: React.FC = () => {
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-display tracking-tight text-white">
-            Refill Tracking & Pharmacy Orders
+            {t.refills || 'Refills & Pharmacy Orders'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
             Real-time dispensing status, courier tracking, and cold-chain temperature verification.
@@ -74,7 +78,7 @@ export const RefillsView: React.FC = () => {
           className="px-5 py-3 rounded-2xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center gap-2 transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" />
-          <span>Request New Refill</span>
+          <span>{tSafe(t, 'requestRefill', 'Request New Refill')}</span>
         </button>
       </div>
 
@@ -87,14 +91,14 @@ export const RefillsView: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-display font-bold text-lg text-slate-900">
-                Order Medication Refill
+                {t.orderRefill || 'Order Medication Refill'}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsOrdering(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
             <p className="text-xs text-slate-500 mb-4">
@@ -131,13 +135,13 @@ export const RefillsView: React.FC = () => {
                 onClick={() => setIsOrdering(false)}
                 className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
               >
-                Cancel
+                {tSafe(t, 'cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md active:scale-95"
               >
-                Submit Order to Pharmacy
+                {t.orderRefill || 'Submit Order to Pharmacy'}
               </button>
             </div>
           </form>
@@ -149,8 +153,12 @@ export const RefillsView: React.FC = () => {
         {refillOrders.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 text-slate-400">
             <PackageCheck className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-            <div className="font-bold text-slate-700 text-sm">No active refill orders</div>
-            <p className="text-xs text-slate-400 mt-1">Click "Request New Refill" to dispatch a prescription order.</p>
+            <div className="font-bold text-slate-700 text-sm">
+              {tSafe(t, 'noRefillOrders', 'No active refill orders')}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Click "Request New Refill" to dispatch a prescription order.
+            </p>
           </div>
         ) : (
           refillOrders.map((order) => {
@@ -177,7 +185,7 @@ export const RefillsView: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-700 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1 rounded-xl capitalize">
+                    <span className="text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1 rounded-xl capitalize">
                       Status: {order.status.replace(/_/g, ' ')}
                     </span>
                   </div>

@@ -15,6 +15,7 @@ import {
   Eye,
   Zap,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 import { NotificationCenterModal } from './NotificationCenterModal';
 import { GlobalSearchModal } from './GlobalSearchModal';
@@ -126,82 +127,104 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
     },
   ];
 
-  const languages: { code: LanguageCode; label: string; nativeName: string }[] = [
-    { code: 'en', label: 'English', nativeName: 'English (US)' },
-    { code: 'hi', label: 'Hindi', nativeName: 'हिन्दी (Hindi)' },
-    { code: 'es', label: 'Spanish', nativeName: 'Español' },
-    { code: 'fr', label: 'French', nativeName: 'Français' },
-    { code: 'zh', label: 'Mandarin', nativeName: '中文 (简体)' },
+  const languages: { code: LanguageCode; label: string; nativeName: string; region: string }[] = [
+    { code: 'en', label: 'English', nativeName: 'English (US)', region: 'Global' },
+    { code: 'hi', label: 'Hindi', nativeName: 'हिन्दी (Hindi)', region: 'India (National)' },
+    { code: 'kn', label: 'Kannada', nativeName: 'ಕನ್ನಡ (Kannada)', region: 'Karnataka' },
+    { code: 'ta', label: 'Tamil', nativeName: 'தமிழ் (Tamil)', region: 'Tamil Nadu' },
+    { code: 'te', label: 'Telugu', nativeName: 'తెలుగు (Telugu)', region: 'Andhra & Telangana' },
+    { code: 'ml', label: 'Malayalam', nativeName: 'മലയാളം (Malayalam)', region: 'Kerala' },
+    { code: 'bn', label: 'Bengali', nativeName: 'বাংলা (Bengali)', region: 'West Bengal' },
+    { code: 'mr', label: 'Marathi', nativeName: 'मराठी (Marathi)', region: 'Maharashtra' },
+    { code: 'gu', label: 'Gujarati', nativeName: 'ગુજરાતી (Gujarati)', region: 'Gujarat' },
+    { code: 'pa', label: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ (Punjabi)', region: 'Punjab' },
+    { code: 'es', label: 'Spanish', nativeName: 'Español', region: 'Global' },
+    { code: 'fr', label: 'French', nativeName: 'Français', region: 'Global' },
+    { code: 'zh', label: 'Mandarin', nativeName: '中文 (简体)', region: 'Global' },
   ];
 
   const currentRoleConfig = roleConfigs.find((r) => r.role === activeRole) || roleConfigs[0];
   const CurrentRoleIcon = currentRoleConfig.icon;
+  const currentTabTitle = (t as any)[currentTab] || currentTab;
 
   return (
     <header
       id="medisync-global-header"
-      className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-colors"
+      className="h-16 shrink-0 w-full flex items-center justify-between px-3 sm:px-6 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs z-30 relative"
     >
       {/* Left: View title & mobile indicator */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
         {onOpenMobileSidebar && (
           <button
             onClick={onOpenMobileSidebar}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0"
             title="Open navigation menu"
             aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
           </button>
         )}
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl font-bold font-display text-slate-900 capitalize tracking-tight">
-              {currentTab}
+            <h1 className="text-base sm:text-lg font-bold font-display text-slate-900 capitalize tracking-tight truncate max-w-[160px] sm:max-w-[240px] md:max-w-xs">
+              {currentTabTitle}
             </h1>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-teal-50 text-teal-700 border border-teal-200">
-              Live Synchronized
+            <span className="hidden 2xl:inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-teal-50 text-teal-700 border border-teal-200 whitespace-nowrap shrink-0">
+              {t.liveSync || 'Live Synchronized'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 hidden md:block">
-            Connected Care Ecosystem • {currentUser.name} ({currentUser.identifier})
+          <p className="text-[11px] text-slate-500 hidden 2xl:block truncate max-w-sm">
+            {t.connectedEcosystem || 'Connected Care Ecosystem'} • {currentUser.name} ({currentUser.identifier})
           </p>
         </div>
       </div>
 
       {/* Middle/Right: Actions, Global Search, Role Switcher, Lang, Profile */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Mobile Quick Search Button (Android & compact devices) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        {/* Mobile Quick Search Button */}
         <button
           onClick={() => setIsSearchOpen(true)}
-          className="lg:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          className="md:hidden p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0"
           title="Search medications, patients, prescriptions (Ctrl+K)"
           aria-label="Search"
         >
           <Search className="w-4 h-4" />
         </button>
 
-        {/* Desktop Global Quick Search Bar */}
+        {/* Desktop & Tablet Global Quick Search Bar */}
         <button
           onClick={() => setIsSearchOpen(true)}
-          className="relative hidden lg:flex items-center justify-between w-52 xl:w-72 px-3 py-1.5 text-xs rounded-xl bg-slate-100/90 hover:bg-white border border-slate-200/80 hover:border-teal-400 hover:shadow-xs text-slate-400 hover:text-slate-600 transition-all text-left group"
+          className="relative hidden md:flex items-center justify-between w-36 lg:w-48 2xl:w-64 px-3 py-1.5 text-xs rounded-xl bg-slate-100/90 hover:bg-white border border-slate-200/80 hover:border-teal-400 hover:shadow-xs text-slate-400 hover:text-slate-600 transition-all text-left group shrink-0"
           title="Search medications, patients, prescriptions (Ctrl+K)"
         >
-          <div className="flex items-center gap-2">
-            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-colors" />
-            <span className="truncate">Search meds, patients, rx...</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-colors shrink-0" />
+            <span className="truncate">{t.searchMedsPlaceholder || 'Search meds, patients, rx...'}</span>
           </div>
-          <kbd className="text-[10px] font-mono font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 text-slate-400 shadow-2xs">
+          <kbd className="text-[10px] font-mono font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 text-slate-400 shadow-2xs shrink-0 ml-1">
             ⌘K
           </kbd>
         </button>
 
+        {/* Gemini & Sarvam AI Assistant Header Button */}
+        <button
+          onClick={() => {
+            const trigger = document.getElementById('medivoice-floating-trigger');
+            if (trigger) trigger.click();
+          }}
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-teal-200/80 bg-teal-50/70 hover:bg-teal-100 text-teal-900 text-xs font-bold transition-all shadow-xs active:scale-95 shrink-0 whitespace-nowrap"
+          title="Open MediSync Gemini & Sarvam Indic Assistant"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+          <span className="hidden sm:inline">{t.askAiAssistant || 'Ask Gemini'}</span>
+        </button>
+
         {/* DEMO ROLE SWITCHER (Core hackathon showcase) */}
-        <div className="relative" ref={roleMenuRef}>
+        <div className="relative shrink-0" ref={roleMenuRef}>
           <button
             id="demo-role-switcher-button"
             onClick={() => setRoleMenuOpen((prev) => !prev)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs sm:text-sm font-semibold shadow-xs transition-all ${currentRoleConfig.color} hover:shadow-md active:scale-95`}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-xs transition-all ${currentRoleConfig.color} hover:shadow-md active:scale-95 whitespace-nowrap shrink-0`}
             title="Switch demo role (Preserves all shared state)"
           >
             <CurrentRoleIcon className="w-4 h-4 shrink-0" />
@@ -209,13 +232,13 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
             <span className="hidden md:inline text-[10px] px-1.5 py-0.2 rounded-md bg-white/60 font-mono">
               DEMO
             </span>
-            <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5" />
+            <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5 shrink-0" />
           </button>
 
           {roleMenuOpen && (
             <div
               id="demo-role-dropdown-menu"
-              className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+              className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="px-3 py-2 border-b border-slate-100 mb-1">
                 <div className="flex items-center justify-between">
@@ -258,8 +281,8 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <div className="text-xs sm:text-sm font-semibold">{item.label}</div>
-                          {isCurrent && <Check className="w-4 h-4 text-teal-600 shrink-0" />}
+                          <div className="text-xs sm:text-sm font-semibold truncate">{item.label}</div>
+                          {isCurrent && <Check className="w-4 h-4 text-teal-600 shrink-0 ml-1" />}
                         </div>
                         <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 leading-snug">
                           {item.desc}
@@ -274,27 +297,32 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
         </div>
 
         {/* Global Language Selector */}
-        <div className="relative" ref={langMenuRef}>
+        <div className="relative shrink-0" ref={langMenuRef}>
           <button
             id="global-language-selector-button"
             onClick={() => setLangMenuOpen((prev) => !prev)}
-            className="flex items-center gap-1.5 p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors"
+            className="flex items-center gap-1.5 p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors shrink-0"
             title="Select Language"
             aria-label="Language Selector"
           >
-            <Globe className="w-4 h-4" />
+            <Globe className="w-4 h-4 shrink-0" />
             <span className="text-xs font-semibold uppercase">{language}</span>
           </button>
 
           {langMenuOpen && (
             <div
               id="global-language-dropdown"
-              className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+              className="absolute right-0 mt-2 w-64 sm:w-72 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
             >
-              <div className="px-2.5 py-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Select Language
+              <div className="px-2.5 py-1.5 border-b border-slate-100 mb-1 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Language / ಭಾಷೆ
+                </span>
+                <span className="text-[10px] text-teal-700 font-semibold bg-teal-50 px-2 py-0.5 rounded-full">
+                  13 Languages
+                </span>
               </div>
-              <div className="space-y-0.5">
+              <div className="max-h-80 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
@@ -302,14 +330,17 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
                       changeLanguage(lang.code);
                       setLangMenuOpen(false);
                     }}
-                    className={`w-full text-left px-2.5 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
                       language === lang.code
-                        ? 'bg-teal-50 text-teal-800 font-bold'
+                        ? 'bg-teal-50 text-teal-900 font-bold border border-teal-200 shadow-2xs'
                         : 'hover:bg-slate-100 text-slate-700'
                     }`}
                   >
-                    <span>{lang.nativeName}</span>
-                    {language === lang.code && <Check className="w-3.5 h-3.5 text-teal-600" />}
+                    <div>
+                      <div className="font-semibold text-slate-900">{lang.nativeName}</div>
+                      <div className="text-[10px] text-slate-400 font-normal">{lang.region}</div>
+                    </div>
+                    {language === lang.code && <Check className="w-4 h-4 text-teal-600 shrink-0" />}
                   </button>
                 ))}
               </div>
@@ -318,11 +349,11 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
         </div>
 
         {/* Accessibility Menu */}
-        <div className="relative" ref={accessMenuRef}>
+        <div className="relative shrink-0" ref={accessMenuRef}>
           <button
             id="accessibility-options-button"
             onClick={() => setAccessMenuOpen((prev) => !prev)}
-            className={`p-2 rounded-xl border transition-colors ${
+            className={`p-2 rounded-xl border transition-colors shrink-0 ${
               largeTextMode || highContrastMode || reducedMotion
                 ? 'bg-teal-50 border-teal-200 text-teal-700'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-transparent'
@@ -330,13 +361,13 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
             title="Accessibility Settings (High contrast, Large text, Reduced motion)"
             aria-label="Accessibility options"
           >
-            <Sliders className="w-4 h-4" />
+            <Sliders className="w-4 h-4 shrink-0" />
           </button>
 
           {accessMenuOpen && (
             <div
               id="accessibility-dropdown-menu"
-              className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
+              className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
                 Accessibility Controls
@@ -344,7 +375,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
               <div className="space-y-2">
                 <label className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 cursor-pointer">
                   <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-                    <Eye className="w-4 h-4 text-teal-600" />
+                    <Eye className="w-4 h-4 text-teal-600 shrink-0" />
                     <span>Large Text Mode</span>
                   </div>
                   <input
@@ -356,7 +387,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
                 </label>
                 <label className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 cursor-pointer">
                   <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-                    <Zap className="w-4 h-4 text-indigo-600" />
+                    <Zap className="w-4 h-4 text-indigo-600 shrink-0" />
                     <span>High Contrast Mode</span>
                   </div>
                   <input
@@ -368,7 +399,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
                 </label>
                 <label className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 cursor-pointer">
                   <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-                    <Sliders className="w-4 h-4 text-sky-600" />
+                    <Sliders className="w-4 h-4 text-sky-600 shrink-0" />
                     <span>Reduced Motion</span>
                   </div>
                   <input
@@ -384,17 +415,17 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
         </div>
 
         {/* Centralized Notification Center Button */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             id="global-notifications-button"
             onClick={() => setIsNotifCenterOpen(true)}
-            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 flex items-center justify-center transition-colors shrink-0"
             title={`Centralized Notification Center (${unreadCount} unread for ${activeRole})`}
             aria-label="Centralized Notification Center"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-4 h-4 shrink-0" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 text-[10px] font-bold text-white bg-rose-500 rounded-full flex items-center justify-center animate-pulse shadow-xs">
+              <span className="absolute top-1 right-1 w-4 h-4 text-[10px] font-bold text-white bg-rose-500 rounded-full flex items-center justify-center animate-pulse shadow-xs">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -402,11 +433,11 @@ export const Header: React.FC<HeaderProps> = ({ currentTab = 'MediSync', onSelec
         </div>
 
         {/* User avatar snapshot */}
-        <div className="flex items-center gap-2 pl-1 border-l border-slate-200">
+        <div className="flex items-center gap-2 pl-1 border-l border-slate-200 shrink-0">
           <img
             src={currentUser.avatar}
             alt={currentUser.name}
-            className="w-8 h-8 rounded-xl object-cover ring-2 ring-teal-500/20 shadow-xs"
+            className="w-8 h-8 rounded-xl object-cover ring-2 ring-teal-500/20 shadow-xs shrink-0"
           />
         </div>
       </div>

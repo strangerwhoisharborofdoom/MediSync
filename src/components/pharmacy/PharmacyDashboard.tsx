@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { RefillOrder, InventoryItem, Prescription } from '../../types';
+import { PharmacyAlertsView } from './PharmacyAlertsView';
 import {
   Building2,
   Package,
@@ -17,10 +18,11 @@ import {
   ChevronRight,
   TrendingDown,
   Sparkles,
+  Bell,
 } from 'lucide-react';
 
 interface PharmacyDashboardProps {
-  initialSubTab?: 'refills' | 'prescriptions' | 'inventory' | 'delivery';
+  initialSubTab?: 'refills' | 'prescriptions' | 'inventory' | 'delivery' | 'alerts';
 }
 
 export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSubTab }) => {
@@ -33,7 +35,7 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
     t,
   } = useApp();
 
-  const [activeSubTab, setActiveSubTab] = useState<'refills' | 'prescriptions' | 'inventory' | 'delivery'>(
+  const [activeSubTab, setActiveSubTab] = useState<'refills' | 'prescriptions' | 'inventory' | 'delivery' | 'alerts'>(
     initialSubTab || 'refills'
   );
 
@@ -42,6 +44,10 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
       setActiveSubTab(initialSubTab);
     }
   }, [initialSubTab]);
+
+  const pharmacyAlertCount =
+    inventory.filter((i) => i.status === 'critical' || i.status === 'low_stock').length +
+    refillOrders.filter((o) => o.status === 'pending_preparation' || o.status === 'preparing').length;
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<RefillOrder | null>(refillOrders[0] || null);
 
@@ -70,10 +76,10 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700 shrink-0">
           <button
             onClick={() => setActiveSubTab('refills')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeSubTab === 'refills'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
@@ -83,7 +89,7 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
           </button>
           <button
             onClick={() => setActiveSubTab('prescriptions')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeSubTab === 'prescriptions'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
@@ -93,7 +99,7 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
           </button>
           <button
             onClick={() => setActiveSubTab('inventory')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeSubTab === 'inventory'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
@@ -103,13 +109,24 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
           </button>
           <button
             onClick={() => setActiveSubTab('delivery')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeSubTab === 'delivery'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             Courier Dispatch
+          </button>
+          <button
+            onClick={() => setActiveSubTab('alerts')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 ${
+              activeSubTab === 'alerts'
+                ? 'bg-rose-600 text-white shadow-md'
+                : 'text-rose-300 hover:text-white'
+            }`}
+          >
+            <Bell className="w-3.5 h-3.5 shrink-0" />
+            <span>Pharmacy Alerts ({pharmacyAlertCount})</span>
           </button>
         </div>
       </div>
@@ -535,6 +552,9 @@ export const PharmacyDashboard: React.FC<PharmacyDashboardProps> = ({ initialSub
           </div>
         </div>
       )}
+
+      {/* SUBTAB 5: DEDICATED PHARMACY ALERTS */}
+      {activeSubTab === 'alerts' && <PharmacyAlertsView />}
     </div>
   );
 };

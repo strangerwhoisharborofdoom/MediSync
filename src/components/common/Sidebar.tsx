@@ -33,18 +33,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
 }) => {
-  const { activeRole, currentUser, t, alerts, messages, logout } = useApp();
+  const { activeRole, currentUser, t, alerts, pharmacyAlerts, messages, logout } = useApp();
 
-  const unreadAlerts = alerts.filter((a) => !a.acknowledged).length;
+  const unreadAlerts =
+    activeRole === 'pharmacy'
+      ? pharmacyAlerts.filter((a) => !a.read).length
+      : alerts.filter((a) => !a.acknowledged).length;
   const unreadMessages = messages.filter((m) => !m.isRead && m.receiverRole === activeRole).length;
 
   const navItems = [
     { id: 'dashboard', label: t.dashboard, icon: LayoutDashboard },
     { id: 'medications', label: t.medications, icon: Pill },
     { id: 'prescriptions', label: t.prescriptions, icon: FileText },
-    { id: 'appointments', label: t.appointments, icon: Calendar },
+    ...(activeRole !== 'pharmacy'
+      ? [{ id: 'appointments', label: t.appointments, icon: Calendar }]
+      : []),
     { id: 'messages', label: t.messages, icon: MessageSquare, badge: unreadMessages },
-    { id: 'alerts', label: t.alerts, icon: Bell, badge: unreadAlerts, badgeColor: 'bg-rose-500' },
+    {
+      id: 'alerts',
+      label: activeRole === 'pharmacy' ? (t.pharmacyAlerts || 'Pharmacy Alerts') : t.alerts,
+      icon: Bell,
+      badge: unreadAlerts,
+      badgeColor: 'bg-rose-500',
+    },
     { id: 'reports', label: t.reports, icon: FileBarChart },
     { id: 'refills', label: t.refills, icon: RefreshCw },
     { id: 'audit', label: t.auditLog, icon: ShieldCheck },
@@ -53,22 +64,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const roleMeta = {
     patient: {
-      badge: 'PATIENT PORTAL',
+      badge: t.patientPortal || 'PATIENT PORTAL',
       badgeColor: 'bg-teal-100 text-teal-800 border-teal-200',
       icon: User,
     },
     caregiver: {
-      badge: 'CAREGIVER PORTAL',
+      badge: t.caregiverPortal || 'CAREGIVER PORTAL',
       badgeColor: 'bg-sky-100 text-sky-800 border-sky-200',
       icon: Heart,
     },
     doctor: {
-      badge: 'CLINICAL DOCTOR',
+      badge: t.doctorPortal || 'CLINICAL DOCTOR',
       badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
       icon: Stethoscope,
     },
     pharmacy: {
-      badge: 'PHARMACY DISPATCH',
+      badge: t.pharmacyPortal || 'PHARMACY DISPATCH',
       badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       icon: Building2,
     },
@@ -94,82 +105,80 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         id="medisync-sidebar"
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 sm:w-72 bg-slate-900 text-slate-300 flex flex-col justify-between border-r border-slate-800 transition-transform duration-300 ease-in-out ${
-          isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        className={`fixed lg:static inset-y-0 left-0 z-40 lg:z-auto w-64 sm:w-72 shrink-0 h-full bg-slate-900 text-slate-300 flex flex-col justify-between border-r border-slate-800 transition-transform duration-300 ease-in-out ${
+          isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Top Header & Branding */}
-        <div>
-          <div className="p-5 border-b border-slate-800/80">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-teal-500/20 text-white font-black text-xl tracking-wider">
-                <Activity className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-display font-extrabold text-xl text-white tracking-tight">
-                    MediSync
-                  </span>
-                  <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-400 border border-teal-500/30">
-                    AI
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400 font-medium">Care Journey Ecosystem</p>
-              </div>
+        <div className="shrink-0 p-4 sm:p-5 border-b border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-teal-500/20 text-white font-black text-xl tracking-wider shrink-0">
+              <Activity className="w-6 h-6 animate-pulse" />
             </div>
-
-            {/* Current Role Indicator */}
-            <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-              <span
-                className={`text-[10px] font-bold px-2 py-0.8 rounded-md uppercase tracking-wider flex items-center gap-1.5 ${currentRoleMeta.badgeColor}`}
-              >
-                <RoleIcon className="w-3 h-3" />
-                {currentRoleMeta.badge}
-              </span>
-              <span className="text-[11px] text-slate-400 font-mono">
-                {currentUser.identifier}
-              </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-extrabold text-xl text-white tracking-tight">
+                  MediSync
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                  AI
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-medium truncate">Care Journey Ecosystem</p>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-280px)]">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  id={`sidebar-nav-${item.id}`}
-                  onClick={() => handleSelect(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 ${
-                    isActive
-                      ? 'bg-teal-500 text-white font-semibold shadow-md shadow-teal-500/20'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span
-                      className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full text-white ${
-                        item.badgeColor || 'bg-teal-500'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+          {/* Current Role Indicator */}
+          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold px-2 py-0.8 rounded-md uppercase tracking-wider flex items-center gap-1.5 ${currentRoleMeta.badgeColor}`}
+            >
+              <RoleIcon className="w-3 h-3 shrink-0" />
+              <span className="truncate">{currentRoleMeta.badge}</span>
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono shrink-0">
+              {currentUser.identifier}
+            </span>
+          </div>
         </div>
 
+        {/* Navigation Links - Scrollable Flex Center */}
+        <nav className="flex-1 min-h-0 overflow-y-auto p-3 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                id={`sidebar-nav-${item.id}`}
+                onClick={() => handleSelect(item.id)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 ${
+                  isActive
+                    ? 'bg-teal-500 text-white font-semibold shadow-md shadow-teal-500/20'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <span className="truncate">{item.label}</span>
+                </div>
+
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span
+                    className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full text-white shrink-0 ml-1.5 ${
+                      item.badgeColor || 'bg-teal-500'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
         {/* Bottom Profile & Actions */}
-        <div className="p-3.5 border-t border-slate-800 bg-slate-950/50">
+        <div className="shrink-0 p-3.5 border-t border-slate-800 bg-slate-950/50">
           <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-900/80 border border-slate-800/70 mb-2">
             <img
               src={currentUser.avatar}

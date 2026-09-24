@@ -14,14 +14,23 @@ import {
   Download,
   Send,
   AlertCircle,
+  FileCheck,
 } from 'lucide-react';
 import { PrescriptionScannerModal } from './PrescriptionScannerModal';
+import { DigitalPrescriptionModal } from './DigitalPrescriptionModal';
 
 export const PrescriptionsView: React.FC = () => {
   const { prescriptions, medications, createRefillOrder, patient, addToast, activeRole } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review_required' | 'dispensed'>('all');
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [selectedRxForModal, setSelectedRxForModal] = useState<Prescription | null>(null);
+  const [isDigitalRxOpen, setIsDigitalRxOpen] = useState(false);
+
+  const openDigitalRx = (rx: Prescription) => {
+    setSelectedRxForModal(rx);
+    setIsDigitalRxOpen(true);
+  };
 
   const filteredPrescriptions = prescriptions.filter((rx) => {
     const matchesSearch =
@@ -168,6 +177,13 @@ export const PrescriptionsView: React.FC = () => {
 
               <div className="flex flex-wrap md:flex-col items-center md:items-end gap-2 shrink-0">
                 <button
+                  onClick={() => openDigitalRx(rx)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 flex items-center gap-1.5 transition-all"
+                >
+                  <FileCheck className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Open Digital Rx</span>
+                </button>
+                <button
                   onClick={() => addToast(`Prescription #${rx.id} exported as clinical PDF.`, 'info')}
                   className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 flex items-center gap-1.5 transition-all"
                 >
@@ -196,6 +212,12 @@ export const PrescriptionsView: React.FC = () => {
       <PrescriptionScannerModal
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
+      />
+
+      <DigitalPrescriptionModal
+        isOpen={isDigitalRxOpen}
+        onClose={() => setIsDigitalRxOpen(false)}
+        prescription={selectedRxForModal}
       />
     </div>
   );

@@ -1,16 +1,18 @@
 import React from 'react';
 import { Medication } from '../../types';
 import { useApp } from '../../context/AppContext';
-import { X, Pill, AlertTriangle, Clock, RefreshCw, ShieldAlert, Check } from 'lucide-react';
+import { X, Pill, AlertTriangle, Clock, RefreshCw, ShieldAlert, Check, FileCheck } from 'lucide-react';
 
 interface MedicationDetailsModalProps {
   medication: Medication | null;
   onClose: () => void;
+  onOpenDigitalRx?: (medication: Medication) => void;
 }
 
 export const MedicationDetailsModal: React.FC<MedicationDetailsModalProps> = ({
   medication,
   onClose,
+  onOpenDigitalRx,
 }) => {
   const { createRefillOrder } = useApp();
 
@@ -107,6 +109,17 @@ export const MedicationDetailsModal: React.FC<MedicationDetailsModalProps> = ({
               </p>
             ))}
           </div>
+
+          {/* Digital Prescription Link */}
+          {onOpenDigitalRx && (
+            <button
+              onClick={() => onOpenDigitalRx(medication)}
+              className="w-full py-2.5 px-4 rounded-xl border border-teal-200 bg-teal-50/50 hover:bg-teal-100/70 text-teal-900 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+            >
+              <FileCheck className="w-4 h-4 text-teal-600" />
+              <span>Open Official Digital Prescription (e-Rx)</span>
+            </button>
+          )}
 
           <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400">
             <span>Prescribed by: {medication.prescribedBy}</span>

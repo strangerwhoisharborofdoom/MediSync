@@ -1,6 +1,19 @@
 export type Role = 'patient' | 'caregiver' | 'doctor' | 'pharmacy';
 
-export type LanguageCode = 'en' | 'hi' | 'es' | 'fr' | 'zh';
+export type LanguageCode =
+  | 'en'
+  | 'hi'
+  | 'kn'
+  | 'ta'
+  | 'te'
+  | 'ml'
+  | 'bn'
+  | 'mr'
+  | 'gu'
+  | 'pa'
+  | 'es'
+  | 'fr'
+  | 'zh';
 
 export type DoseStatus = 'taken' | 'upcoming' | 'due' | 'late' | 'missed';
 
@@ -122,6 +135,21 @@ export interface CareAlert {
   actionRequired?: string;
 }
 
+export type PharmacyAlertType = 'STOCK' | 'ORDER' | 'PRESCRIPTION';
+
+export interface PharmacyAlert {
+  id: string;
+  type: PharmacyAlertType;
+  title: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  timestamp: string;
+  read: boolean;
+  relatedOrderId?: string;
+  relatedPrescriptionId?: string;
+  relatedMedicineId?: string;
+}
+
 export interface InventoryItem {
   id: string;
   medicationName: string;
@@ -163,6 +191,7 @@ export interface PatientInfo {
   name: string;
   age: number;
   gender: string;
+  bloodGroup?: string;
   medicalId: string;
   avatar: string;
   conditions: string[];

@@ -56,6 +56,13 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({ onSelect
   const [messageText, setMessageText] = useState('');
 
   // Active dependent resolved data
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t.goodMorning;
+    if (hour < 17) return t.goodAfternoon;
+    return t.goodEvening;
+  };
+
   const activeDependent = useMemo(() => {
     if (selectedDependent === 'arthur') {
       const arthur = otherPatients?.find((p) => p.name.includes('Arthur') || p.id === 'p-arthur') || {
@@ -124,16 +131,16 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({ onSelect
             <span className="text-xs text-slate-400">Authorized Family Access</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold font-display tracking-tight text-white">
-            {t.careOverview}
+            {getGreeting()}, Sarah
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
             Live Peace of Mind • Connected with {activeDependent.name}'s daily adherence & biometrics.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
           {/* Dependent Selector */}
-          <div className="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
+          <div className="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700 shrink-0">
             <span className="text-xs text-slate-400 font-medium pl-2">Viewing:</span>
             <select
               value={selectedDependent}
@@ -149,9 +156,9 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({ onSelect
           <button
             id="caregiver-sos-trigger"
             onClick={() => setSosModalOpen(true)}
-            className="px-5 py-3 rounded-2xl font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 animate-pulse active:scale-95 transition-all"
+            className="px-4 py-2.5 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 animate-pulse active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
-            <ShieldAlert className="w-4 h-4" />
+            <ShieldAlert className="w-4 h-4 shrink-0" />
             <span>{t.emergencySos}</span>
           </button>
         </div>

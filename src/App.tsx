@@ -17,6 +17,7 @@ import { MediVoiceModal } from './components/voice/MediVoiceModal';
 import { MedicationsView } from './components/patient/MedicationsView';
 import { PrescriptionsView } from './components/patient/PrescriptionsView';
 import { RefillsView } from './components/patient/RefillsView';
+import { PharmacyAlertsView } from './components/pharmacy/PharmacyAlertsView';
 
 const MainAppContent: React.FC = () => {
   const { isLoggedIn, activeRole, highContrastMode, largeTextMode } = useApp();
@@ -59,12 +60,14 @@ const MainAppContent: React.FC = () => {
         return <RefillsView />;
 
       case 'appointments':
+        if (activeRole === 'pharmacy') return <PharmacyDashboard initialSubTab="refills" />;
         return <AppointmentsView />;
 
       case 'messages':
         return <MessagesView />;
 
       case 'alerts':
+        if (activeRole === 'pharmacy') return <PharmacyAlertsView />;
         return <CaregiverDashboard onSelectTab={setActiveTab} />;
 
       case 'reports':
@@ -83,7 +86,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-slate-100/90 text-slate-900 ${
+      className={`h-screen w-full flex flex-col bg-slate-100/90 text-slate-900 overflow-hidden ${
         highContrastMode ? 'contrast-125' : ''
       } ${largeTextMode ? 'text-base' : 'text-sm'}`}
     >
@@ -95,7 +98,7 @@ const MainAppContent: React.FC = () => {
       />
 
       {/* Main Workspace Body */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative">
         {/* Responsive Left Navigation */}
         <Sidebar
           activeTab={activeTab}
@@ -105,8 +108,10 @@ const MainAppContent: React.FC = () => {
         />
 
         {/* Dynamic Center Stage */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-          {renderTabContent()}
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-6">
+          <div className="max-w-7xl mx-auto w-full pb-24 sm:pb-28">
+            {renderTabContent()}
+          </div>
         </main>
       </div>
 
