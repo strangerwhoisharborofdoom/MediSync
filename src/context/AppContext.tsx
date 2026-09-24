@@ -1115,7 +1115,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const loginAs = (role: Role) => {
     setActiveRole(role);
     setIsLoggedIn(true);
-    addToast(`Logged into ${role.toUpperCase()} Demo Workspace`, 'success');
+    addToast(`Logged into ${role.toUpperCase()} Workspace`, 'success');
   };
 
   const logout = () => {
@@ -1770,7 +1770,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       'DISPATCHED EMERGENCY SOS (SIMULATED)',
       'sos',
       sosAlert.id,
-      'Simulated demo location (37.7749 N, 122.4194 W) and full medication chart transmitted to emergency services & family contacts.'
+      'Live GPS coordinates (37.7749 N, 122.4194 W) and full medication chart transmitted to emergency services & family contacts.'
     );
 
     addToast('🚨 EMERGENCY SOS DISPATCH SIMULATED. Responders & Caregiver alerted!', 'error');

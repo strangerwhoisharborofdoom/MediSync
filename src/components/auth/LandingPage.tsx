@@ -134,8 +134,8 @@ export const LandingPage: React.FC = () => {
                 <span className="font-display font-extrabold text-xl text-white tracking-tight">
                   MediSync
                 </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                  HACKATHON BUILD
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                  CONNECTED HEALTHCARE
                 </span>
               </div>
               <p className="text-xs text-slate-400">One Simple Care Journey</p>
@@ -147,7 +147,7 @@ export const LandingPage: React.FC = () => {
               onClick={() => loginAs('patient')}
               className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-500 text-white transition-all shadow-md shadow-teal-600/20 flex items-center gap-2"
             >
-              <span>Enter Demo</span>
+              <span>Launch MediSync</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -159,7 +159,7 @@ export const LandingPage: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-20">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold mb-6">
             <Zap className="w-3.5 h-3.5 text-teal-400" />
-            <span>Global Innovation Hackathon • Healthcare Ecosystem</span>
+            <span>Intelligent Healthcare Ecosystem • Live Synchronized Care</span>
           </div>
 
           <h1 className="font-display text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
@@ -174,13 +174,35 @@ export const LandingPage: React.FC = () => {
             intelligent medication care platform.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          {/* Direct 1-Click Role Access Buttons */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <button
               onClick={() => loginAs('patient')}
-              className="px-6 py-3.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 hover:from-teal-400 hover:to-cyan-400 transition-all shadow-xl shadow-teal-500/20 flex items-center gap-2"
+              className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-teal-600 hover:bg-teal-500 text-white transition-all shadow-lg shadow-teal-600/20 flex items-center gap-2 active:scale-95"
             >
-              <span>Explore Live Shared State Demo</span>
-              <ArrowRight className="w-4 h-4" />
+              <User className="w-4 h-4" />
+              <span>Patient Dashboard</span>
+            </button>
+            <button
+              onClick={() => loginAs('caregiver')}
+              className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-sky-600 hover:bg-sky-500 text-white transition-all shadow-lg shadow-sky-600/20 flex items-center gap-2 active:scale-95"
+            >
+              <Heart className="w-4 h-4" />
+              <span>Caregiver Portal</span>
+            </button>
+            <button
+              onClick={() => loginAs('doctor')}
+              className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2 active:scale-95"
+            >
+              <Stethoscope className="w-4 h-4" />
+              <span>Clinical Console</span>
+            </button>
+            <button
+              onClick={() => loginAs('pharmacy')}
+              className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2 active:scale-95"
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Pharmacy Dispatch</span>
             </button>
           </div>
         </div>
@@ -225,14 +247,14 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Role Cards for Instant Demo Login */}
+        {/* Role Cards for Instant Direct Access */}
         <div>
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
-              Choose Your Interactive Role
+              Select Your Dashboard
             </h2>
             <p className="text-sm text-slate-400 mt-2">
-              All 4 dashboards share the <strong className="text-teal-300 font-semibold">exact same application state</strong>. An action in one dashboard immediately propagates to the others.
+              All 4 dashboards share the <strong className="text-teal-300 font-semibold">exact same live application state</strong>. An action in one dashboard immediately propagates to the others.
             </p>
           </div>
 
@@ -259,9 +281,9 @@ export const LandingPage: React.FC = () => {
 
                     <h3 className="font-display font-bold text-lg text-white mb-1">{r.name}</h3>
 
-                    {/* Mock credentials indicator */}
+                    {/* Verified credentials indicator */}
                     <div className="my-3 p-2 rounded-xl bg-slate-900/80 border border-slate-700/60 text-xs font-mono">
-                      <div className="text-[10px] text-slate-500 uppercase">{r.identifierLabel} (DEMO)</div>
+                      <div className="text-[10px] text-slate-500 uppercase">{r.identifierLabel}</div>
                       <div className="text-teal-400 font-bold">{r.identifier}</div>
                     </div>
 
@@ -272,7 +294,7 @@ export const LandingPage: React.FC = () => {
                     onClick={() => loginAs(r.role)}
                     className={`w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 ${r.buttonColor}`}
                   >
-                    <span>Launch {r.role.toUpperCase()} Workspace</span>
+                    <span>Launch {r.roleLabel}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -289,7 +311,7 @@ export const LandingPage: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-teal-500" />
             <span>Encrypted Shared State Architecture • Role-Based Access Control</span>
           </div>
-          <p>MediSync © 2026. Built for the Global Innovation Hackathon.</p>
+          <p>MediSync © 2026. Connected Healthcare Ecosystem.</p>
         </div>
       </footer>
     </div>

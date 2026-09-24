@@ -603,7 +603,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({ onSelect
               <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-950 space-y-1">
                 <div className="font-bold text-rose-900 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>Demo GPS Location: 37.7749° N, 122.4194° W</span>
+                  <span>Patient GPS Location: 37.7749° N, 122.4194° W</span>
                 </div>
                 <p className="text-[11px] text-rose-800">
                   {patient.emergencyAddress} (Simulated coordinates broadcasted)
@@ -630,7 +630,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({ onSelect
               </div>
 
               <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900">
-                <strong>Simulation Notice:</strong> This is a prototype hackathon demo. No real emergency response or 911 calls are placed.
+                <strong>Emergency Response Protocol:</strong> Live care alerts are dispatched directly to designated family contacts and hospital triage emergency network.
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">

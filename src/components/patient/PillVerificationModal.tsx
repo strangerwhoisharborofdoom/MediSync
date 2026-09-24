@@ -50,7 +50,7 @@ export const PillVerificationModal: React.FC<PillVerificationModalProps> = ({
                   Visual Pill Verification
                 </h3>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500 text-white">
-                  Demo AI
+                  AI Verification
                 </span>
               </div>
               <p className="text-xs text-slate-300">
@@ -156,7 +156,7 @@ export const PillVerificationModal: React.FC<PillVerificationModalProps> = ({
           <div className="text-[11px] text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200 flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p>
-              <strong>Demo AI Verification:</strong> Visual pill verification is an informational assistive aid in this prototype and does not replace medical supervision or professional pharmacist review.
+              <strong>MediSync AI Verification:</strong> Visual pill verification is an informational assistive aid and does not replace medical supervision or professional pharmacist review.
             </p>
           </div>
 
